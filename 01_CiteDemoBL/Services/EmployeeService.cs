@@ -77,6 +77,21 @@ namespace CiteDemoBL.Services
             };
         }
 
+        public Response<ICollection<CEmployee>> ReadEmployee()
+        {
+            var employees = _dbContext.CEmployees
+                .Include(e => e.Supervisor)
+                .AsNoTracking()
+                .ToList();
+
+            return new Response<ICollection<CEmployee>>
+            {
+                Data = employees,
+                StatusCode = ErrorCodes.Success,
+                Description = "Employees Found."
+            };
+        }
+
         public Response<CEmployee> UpdateEmployee(CEmployee employee)
         {
             var employeeDB = _dbContext.CEmployees

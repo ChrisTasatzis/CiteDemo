@@ -9,6 +9,8 @@ namespace CiteDemoBL.Services
 
         Response<CAttribute> ReadAttribute(Guid id);
 
+        Response<ICollection<CAttribute>> ReadAttribute();
+
         Response<CAttribute> UpdateAttribute(CAttribute attribute);
 
         Response<bool> DeleteAttribute(Guid id);

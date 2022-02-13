@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CiteDemoBL\CiteDemoBL\01_CiteDemoBusinessLayer.csproj" />
+    <ProjectReference Include="..\01_CiteDemoBL\01_CiteDemoBusinessLayer.csproj" />
   </ItemGroup>
 
 </Project>

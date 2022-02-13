@@ -56,6 +56,20 @@ namespace CiteDemoBL.Services
             };
         }
 
+        public Response<ICollection<CAttribute>> ReadAttribute()
+        {
+            var attributes = _dbContext.CAttributes
+                .AsNoTracking()
+                .ToList();
+
+            return new Response<ICollection<CAttribute>>
+            {
+                Data = attributes,
+                StatusCode = ErrorCodes.Success,
+                Description = "CAttribute Found."
+            };
+        }
+
         public Response<CAttribute> UpdateAttribute(CAttribute attribute)
         {
             var attributeDB = _dbContext.CAttributes

@@ -9,6 +9,8 @@ namespace CiteDemoBL.Services
 
         Response<CEmployee> CreateEmployee(CEmployee employee);
 
+        Response<ICollection<CEmployee>> ReadEmployee();
+
         Response<CEmployee> ReadEmployee(Guid id);
 
         Response<CEmployee> UpdateEmployee(CEmployee employee);

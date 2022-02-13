@@ -18,12 +18,15 @@ namespace CiteDemoBL.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            modelBuilder.Entity<EmployeeAttribute>().HasOne(e => e.Employee)
-                .WithMany().HasForeignKey(e => e.EMPATTR_EmployeeID);
+            modelBuilder.Entity<EmployeeAttribute>()
+                .HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EMPATTR_EmployeeID);
 
-            modelBuilder.Entity<EmployeeAttribute>().HasOne(e => e.Attribute)
-               .WithMany().HasForeignKey(e => e.EMPATTR_AttributeID);
-
+            modelBuilder.Entity<EmployeeAttribute>()
+                .HasOne(e => e.Attribute)
+                .WithMany()
+                .HasForeignKey(e => e.EMPATTR_AttributeID);
 
             modelBuilder.Entity<CEmployee>()
                 .HasMany(e => e.Attributes)

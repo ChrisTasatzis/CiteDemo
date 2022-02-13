@@ -28,6 +28,23 @@ namespace CiteDemoApi.Controllers
             return Ok(new EmployeeGetDTO(response.Data));
         }
 
+        [HttpGet]
+        public ActionResult<ICollection<EmployeeGetDTO>> GetEmployee()
+        {
+            Response<ICollection<CEmployee>> response = _employeeService.ReadEmployee();
+
+            if (response.StatusCode != ErrorCodes.Success) return NotFound("No employee found with this id");
+
+            var result = new List<EmployeeGetDTO>();
+
+            foreach (var employee in response.Data)
+            {
+                result.Add(new EmployeeGetDTO(employee));
+            }
+
+            return Ok(result);
+        }
+
         [HttpPost]
         public ActionResult<EmployeeGetDTO> PostEmployee([FromBody] EmployeePostDTO employee)
         {

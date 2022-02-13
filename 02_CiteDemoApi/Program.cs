@@ -11,7 +11,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<CiteDemoDbContext>();
+builder.Services.AddDbContext<CiteDemoDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CiteDemoDB")));
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IAttributeService, AttributeService>();

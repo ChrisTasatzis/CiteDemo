@@ -1,4 +1,5 @@
 ﻿using CiteDemoBL.Models;
+using System.Text.Json.Serialization;
 
 namespace CiteDemoApi.DTO.CEmployeeDTOS
 {
@@ -8,9 +9,20 @@ namespace CiteDemoApi.DTO.CEmployeeDTOS
 
         public string? Name { get; set; }
 
-        public DateTime? DateOfHire { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+
+        public bool? HasCar { get; set; }
+
+        public string? Address { get; set; }
+
+        public decimal? AddressLatitude { get; set; }
+
+        public decimal? AddressLongitude { get; set; }
 
         public Guid? SupervisorId { get; set; }
+
+        [JsonConstructor]
+        public EmployeeGetDTO() {}
 
         public EmployeeGetDTO(CEmployee employee)
         {
@@ -18,7 +30,15 @@ namespace CiteDemoApi.DTO.CEmployeeDTOS
 
             Name = employee.Name;
 
-            DateOfHire = employee.DateOfHire;
+            DateOfBirth = employee.DateOfBirth;
+
+            HasCar = employee.HasCar;   
+
+            Address = employee.Address; 
+
+            AddressLatitude = employee.AddressLatitude;
+
+            AddressLongitude = employee.AddressLongitude;
 
             if(employee.Supervisor != null)
                 SupervisorId = employee.Supervisor.Id;
@@ -28,3 +48,5 @@ namespace CiteDemoApi.DTO.CEmployeeDTOS
 
     }
 }
+
+
