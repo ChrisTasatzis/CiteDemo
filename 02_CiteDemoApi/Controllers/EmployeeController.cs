@@ -2,6 +2,8 @@
 using CiteDemoBL.Models;
 using CiteDemoBL.Services;
 using CiteDemoBL.Static;
+using Geocoding;
+using Geocoding.Google;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -56,6 +58,37 @@ namespace CiteDemoApi.Controllers
             else
                 response = _employeeService.CreateEmployee(employee.ToCEmployee());
             
+
+            if (response.StatusCode != ErrorCodes.Success) return BadRequest("Could not add employee");
+
+            return Ok(new EmployeeGetDTO(response.Data));
+
+        }
+
+        [HttpPost, Route("Geocoding")]
+        public async Task<ActionResult<EmployeeGetDTO>> PostEmployeeGeocoding([FromBody] EmployeePostGeocodingDTO employee)
+        {
+            CEmployee employeeObj = employee.ToCEmployee();
+            Response<CEmployee> response;
+
+            try
+            {
+                GoogleGeocoder geocoder = new GoogleGeocoder() { ApiKey = "api key here " };
+                IEnumerable<Address> addresses = await geocoder.GeocodeAsync(employee.Address);
+
+                employeeObj.AddressLatitude = (decimal)addresses.First().Coordinates.Latitude;
+                employeeObj.AddressLongitude = (decimal)addresses.First().Coordinates.Longitude;
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error within the google geocoding api occured");
+            }
+
+            if (employee.SupervisorId != null)
+                response = _employeeService.CreateEmployee(employeeObj, new Guid(employee.SupervisorId));
+            else
+                response = _employeeService.CreateEmployee(employeeObj);
+
 
             if (response.StatusCode != ErrorCodes.Success) return BadRequest("Could not add employee");
 
