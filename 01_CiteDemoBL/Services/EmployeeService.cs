@@ -57,6 +57,7 @@ namespace CiteDemoBL.Services
         {
             var employee = _dbContext.CEmployees
                 .Include(e => e.Supervisor)
+                .Include(e => e.Attributes)
                 .AsNoTracking()
                 .FirstOrDefault(u => u.Id == id);
 
@@ -81,6 +82,7 @@ namespace CiteDemoBL.Services
         {
             var employees = _dbContext.CEmployees
                 .Include(e => e.Supervisor)
+                .Include(e => e.Attributes)
                 .AsNoTracking()
                 .ToList();
 

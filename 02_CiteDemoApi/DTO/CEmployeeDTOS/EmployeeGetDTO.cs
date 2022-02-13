@@ -1,4 +1,5 @@
-﻿using CiteDemoBL.Models;
+﻿using CiteDemoApi.DTO.CAttributeDTOS;
+using CiteDemoBL.Models;
 using System.Text.Json.Serialization;
 
 namespace CiteDemoApi.DTO.CEmployeeDTOS
@@ -18,6 +19,8 @@ namespace CiteDemoApi.DTO.CEmployeeDTOS
         public decimal? AddressLatitude { get; set; }
 
         public decimal? AddressLongitude { get; set; }
+
+        public ICollection<AttributeGetDTO> Attributes { get; set; } = new List<AttributeGetDTO>();
 
         public Guid? SupervisorId { get; set; }
 
@@ -44,6 +47,11 @@ namespace CiteDemoApi.DTO.CEmployeeDTOS
                 SupervisorId = employee.Supervisor.Id;
             else 
                 SupervisorId = null;    
+
+            foreach(var attribute in employee.Attributes)
+            {
+                Attributes.Add(new AttributeGetDTO(attribute));
+            }
         }
 
     }
