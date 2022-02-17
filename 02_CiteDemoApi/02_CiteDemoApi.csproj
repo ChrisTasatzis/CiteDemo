@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Geocoding.Core" Version="4.0.1" />
     <PackageReference Include="Geocoding.Google" Version="4.0.1" />
+    <PackageReference Include="GoogleApi" Version="4.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 

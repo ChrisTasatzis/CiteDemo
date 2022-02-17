@@ -1,22 +1,33 @@
+using CiteDemoApi;
 using CiteDemoBL.Models;
 using CiteDemoBL.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Load configuration for the SQLServer context
 builder.Services.AddDbContext<CiteDemoDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CiteDemoDB")));
 
+// Dependency Injection for the services
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IAttributeService, AttributeService>();
 
+// This is needed in order to run accept API calls from the front end
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder =>
+        {
+            builder.WithOrigins("http://127.0.0.1:5500")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
@@ -30,6 +41,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors();
 
 app.MapControllers();
 

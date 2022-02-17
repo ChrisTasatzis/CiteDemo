@@ -24,9 +24,6 @@ namespace CiteDemoApi.DTO.CEmployeeDTOS
 
         public Guid? SupervisorId { get; set; }
 
-        [JsonConstructor]
-        public EmployeeGetDTO() {}
-
         public EmployeeGetDTO(CEmployee employee)
         {
             Id = employee.Id;
@@ -48,10 +45,14 @@ namespace CiteDemoApi.DTO.CEmployeeDTOS
             else 
                 SupervisorId = null;    
 
-            foreach(var attribute in employee.Attributes)
+            if(employee.Attributes != null)
             {
-                Attributes.Add(new AttributeGetDTO(attribute));
+                foreach (var attribute in employee.Attributes)
+                {
+                    Attributes.Add(new AttributeGetDTO(attribute));
+                }
             }
+          
         }
 
     }

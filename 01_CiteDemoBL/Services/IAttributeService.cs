@@ -5,15 +5,15 @@ namespace CiteDemoBL.Services
 {
     public interface IAttributeService
     {
-        Response<CAttribute> CreateAttribute(CAttribute attribute);
+        Task<Response<CAttribute>> CreateAttribute(CAttribute attribute);
 
-        Response<CAttribute> ReadAttribute(Guid id);
+        Task<Response<CAttribute>> ReadAttribute(Guid? id);
 
-        Response<ICollection<CAttribute>> ReadAttribute();
+        Task<Response<ICollection<CAttribute>>> ReadAttribute();
 
-        Response<CAttribute> UpdateAttribute(CAttribute attribute);
+        Task<Response<CAttribute>> UpdateAttribute(CAttribute attribute);
 
-        Response<bool> DeleteAttribute(Guid id);
+        Task<Response<bool>> DeleteAttribute(Guid? id);
 
     }
 }

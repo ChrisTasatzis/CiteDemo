@@ -11,9 +11,6 @@ namespace CiteDemoApi.DTO.CAttributeDTOS
 
         public string? Value { get; set; }
 
-        [JsonConstructor]
-        public AttributeGetDTO() {}
-
         public AttributeGetDTO(CAttribute attribute)
         {
             Id = attribute.Id;

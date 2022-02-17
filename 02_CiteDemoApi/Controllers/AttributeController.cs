@@ -10,7 +10,7 @@ namespace CiteDemoApi.Controllers
     [ApiController]
     public class AttributeController : Controller
     {
-        private IAttributeService _AttributeService;
+        private readonly IAttributeService _AttributeService;
 
         public AttributeController(IAttributeService AttributeService)
         {
@@ -18,21 +18,21 @@ namespace CiteDemoApi.Controllers
         }
 
         [HttpGet, Route("{id}")]
-        public ActionResult<AttributeGetDTO> GetAttribute([FromRoute] Guid id)
+        public async Task<ActionResult<AttributeGetDTO>> GetAttribute([FromRoute] Guid id)
         {
-            Response<CAttribute> response = _AttributeService.ReadAttribute(id);
+            Response<CAttribute> response = await _AttributeService.ReadAttribute(id);
 
-            if (response.StatusCode != ErrorCodes.Success) return NotFound("No Attribute found with this id");
+            if (response.StatusCode != ErrorCodes.Success) return NotFound(response.Description);
 
             return Ok(new AttributeGetDTO(response.Data));
         }
 
         [HttpGet]
-        public ActionResult<ICollection<AttributeGetDTO>> GetAttribute()
+        public async Task<ActionResult<ICollection<AttributeGetDTO>>> GetAttribute()
         {
-            Response<ICollection<CAttribute>> response = _AttributeService.ReadAttribute();
+            Response<ICollection<CAttribute>> response = await _AttributeService.ReadAttribute();
 
-            if (response.StatusCode != ErrorCodes.Success) return NotFound("No Attribute found with this id");
+            if (response.StatusCode != ErrorCodes.Success) return NotFound(response.Description);
 
             var result = new List<AttributeGetDTO>();
 
@@ -45,22 +45,22 @@ namespace CiteDemoApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult<AttributeGetDTO> PostAttribute([FromBody] AttributePostDTO Attribute)
+        public async Task<ActionResult<AttributeGetDTO>> PostAttribute([FromBody] AttributePostDTO Attribute)
         {
 
-            Response<CAttribute> response = _AttributeService.CreateAttribute(Attribute.ToCAttribute());
+            Response<CAttribute> response = await _AttributeService.CreateAttribute(Attribute.ToCAttribute());
 
-            if (response.StatusCode != ErrorCodes.Success) return BadRequest("Could not add Attribute");
+            if (response.StatusCode != ErrorCodes.Success) return BadRequest(response.Description);
 
             return Ok(new AttributeGetDTO(response.Data));
 
         }
 
         [HttpPut]
-        public ActionResult<AttributeGetDTO> PutAttribute([FromBody] AttributePutDTO Attribute)
+        public async Task< ActionResult<AttributeGetDTO>> PutAttribute([FromBody] AttributePutDTO Attribute)
         {
 
-            Response<CAttribute> response = _AttributeService.UpdateAttribute(Attribute.ToCAttribute());
+            Response<CAttribute> response = await _AttributeService.UpdateAttribute(Attribute.ToCAttribute());
 
             if (response.StatusCode != ErrorCodes.Success) return BadRequest(response.Description);
 
@@ -69,13 +69,13 @@ namespace CiteDemoApi.Controllers
         }
 
         [HttpDelete, Route("{id}")]
-        public ActionResult<bool> DeleteAttribute([FromRoute] Guid id)
+        public async Task<ActionResult<bool>> DeleteAttribute([FromRoute] Guid id)
         {
-            Response<bool> response = _AttributeService.DeleteAttribute(id);
+            Response<bool> response = await _AttributeService.DeleteAttribute(id);
 
-            if (response.StatusCode != ErrorCodes.Success) return NotFound("No Attribute found with this id");
+            if (response.StatusCode != ErrorCodes.Success) return NotFound(response.Description);
 
-            return Ok(response.Data);
+            return Ok(response.Description);
         }
     }
 }

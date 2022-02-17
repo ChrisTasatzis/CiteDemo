@@ -10,27 +10,21 @@ namespace CiteDemoBL.Models
         [Column("EMP_ID")]
         public Guid Id { get; set; }
 
-        [Required]
         [Column("EMP_Name")]
         public string Name { get; set; }
 
-        [Required]
         [Column("EMP_DateOfBirth")]
         public DateTime DateOfBirth { get; set; }
 
-        [Required]
         [Column("EMP_HasCar")]
         public bool HasCar { get; set; }
 
-        [Required]
         [Column("EMP_Address")]
         public string Address { get; set; }
 
-        [Required]
         [Column("EMP_AddressLatitude")]
         public decimal AddressLatitude { get; set; }
 
-        [Required]
         [Column("EMP_AddressLongitude")]
         public decimal AddressLongitude { get; set; }
 
@@ -54,6 +48,18 @@ namespace CiteDemoBL.Models
             this.AddressLongitude = employee.AddressLongitude;
 
             this.Supervisor = employee.Supervisor;
+
+            this.Attributes = employee.Attributes;
+        }
+
+        public bool hasAttribute(string attributeName)
+        {
+            return this.Attributes.Any(a => a.Name == attributeName);
+        }
+
+        public bool hasAttribute(Guid? attributeId)
+        {
+            return this.Attributes.Any(a => a.Id == attributeId);
         }
     }
 }

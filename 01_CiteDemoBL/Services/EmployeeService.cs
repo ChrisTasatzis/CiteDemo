@@ -6,43 +6,42 @@ namespace CiteDemoBL.Services
 {
     public class EmployeeService : IEmployeeService
     {
-        private CiteDemoDbContext _dbContext;
+        private readonly CiteDemoDbContext _dbContext;
 
         public EmployeeService(CiteDemoDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public Response<CEmployee> CreateEmployee(CEmployee employee, Guid? supervisorId)
+        public async Task<Response<CEmployee>> CreateEmployee(CEmployee employee, Guid? supervisorId)
         {
+            CEmployee? supervisor = null;
 
-            var supervisor = _dbContext.CEmployees.FirstOrDefault(u => u.Id == supervisorId);
-
-            if (supervisor == null)
+            if(supervisorId != null)
             {
-                return new Response<CEmployee>
+                supervisor = await _dbContext.CEmployees.FirstOrDefaultAsync(u => u.Id == supervisorId);
+
+                if (supervisor == null)
                 {
-                    Data = null,
-                    StatusCode = ErrorCodes.SupervisorNotFound,
-                    Description = "No employee with this supervisor id exists."
-                };
+                    return new Response<CEmployee>
+                    {
+                        Data = null,
+                        StatusCode = ErrorCodes.SupervisorNotFound,
+                        Description = "No employee with this supervisor id exists."
+                    };
+                }
             }
 
             employee.Supervisor = supervisor;
 
-            return CreateEmployee(employee);
-        }
-
-        public Response<CEmployee> CreateEmployee(CEmployee employee)
-        {
             _dbContext.CEmployees.Add(employee);
 
-            if (_dbContext.SaveChanges() != 1)
+            if (await _dbContext.SaveChangesAsync() != 1)
                 return new Response<CEmployee>
                 {
                     Data = null,
                     StatusCode = ErrorCodes.InternalError,
-                    Description = "Could not save changes."
+                    Description = "No changes saved."
                 };
 
             return new Response<CEmployee>
@@ -53,13 +52,13 @@ namespace CiteDemoBL.Services
             };
         }
 
-        public Response<CEmployee> ReadEmployee(Guid id)
+        public async Task<Response<CEmployee>> ReadEmployee(Guid? id)
         {
-            var employee = _dbContext.CEmployees
+            var employee = await  _dbContext.CEmployees
                 .Include(e => e.Supervisor)
                 .Include(e => e.Attributes)
                 .AsNoTracking()
-                .FirstOrDefault(u => u.Id == id);
+                .FirstOrDefaultAsync(u => u.Id == id);
 
 
             if (employee == null)
@@ -78,13 +77,13 @@ namespace CiteDemoBL.Services
             };
         }
 
-        public Response<ICollection<CEmployee>> ReadEmployee()
+        public async Task<Response<ICollection<CEmployee>>> ReadEmployee()
         {
-            var employees = _dbContext.CEmployees
+            var employees = await _dbContext.CEmployees
                 .Include(e => e.Supervisor)
                 .Include(e => e.Attributes)
                 .AsNoTracking()
-                .ToList();
+                .ToListAsync();
 
             return new Response<ICollection<CEmployee>>
             {
@@ -94,11 +93,12 @@ namespace CiteDemoBL.Services
             };
         }
 
-        public Response<CEmployee> UpdateEmployee(CEmployee employee)
+        public async Task<Response<CEmployee>> UpdateEmployee(CEmployee employee)
         {
-            var employeeDB = _dbContext.CEmployees
+            var employeeDB = await _dbContext.CEmployees
                 .Include(u => u.Supervisor)
-                .FirstOrDefault(u => u.Id == employee.Id);
+                .Include(u => u.Attributes)
+                .FirstOrDefaultAsync(u => u.Id == employee.Id);
 
             if (employeeDB == null)
                 return new Response<CEmployee>
@@ -110,12 +110,12 @@ namespace CiteDemoBL.Services
 
             employeeDB.Copy(employee);
 
-            if (_dbContext.SaveChanges() != 1)
+            if (await _dbContext.SaveChangesAsync() != 1)
                 return new Response<CEmployee>
                 {
                     Data = null,
                     StatusCode = ErrorCodes.InternalError,
-                    Description = "Could not save changes."
+                    Description = "No changes saved."
                 };
 
             return new Response<CEmployee>
@@ -126,9 +126,9 @@ namespace CiteDemoBL.Services
             };
     }
 
-        public Response<CEmployee> UpdateEmployee(CEmployee employee, Guid? supervisorId)
+        public async Task<Response<CEmployee>> UpdateEmployee(CEmployee employee, Guid? supervisorId)
         {
-            var supervisor = _dbContext.CEmployees.FirstOrDefault(u => u.Id == supervisorId);
+            var supervisor = await _dbContext.CEmployees.FirstOrDefaultAsync(u => u.Id == supervisorId);
 
             if (supervisor == null)
             {
@@ -142,13 +142,13 @@ namespace CiteDemoBL.Services
 
             employee.Supervisor = supervisor;
 
-            return UpdateEmployee(employee);
+            return await UpdateEmployee(employee);
         }
 
-        public Response<bool> DeleteEmployee(Guid id)
+        public async Task<Response<bool>> DeleteEmployee(Guid? id)
         {
-            var employeeDB = _dbContext.CEmployees
-                .FirstOrDefault(u => u.Id == id);
+            var employeeDB = await _dbContext.CEmployees
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if (employeeDB == null)
                 return new Response<bool>
@@ -160,12 +160,12 @@ namespace CiteDemoBL.Services
 
             _dbContext.CEmployees.Remove(employeeDB);
 
-            if (_dbContext.SaveChanges() != 1)
+            if (await _dbContext.SaveChangesAsync() != 1)
                 return new Response<bool>
                 {
                     Data = false,
                     StatusCode = ErrorCodes.InternalError,
-                    Description = "Could not save changes."
+                    Description = "No changes saved."
                 };
 
             return new Response<bool>
@@ -177,6 +177,91 @@ namespace CiteDemoBL.Services
 
         }
 
-    
+        public async Task<Response<CEmployee>> AddAttribute(Guid? employeeId, CAttribute attribute)
+        {
+            var employee = await _dbContext.CEmployees
+                .Include(e => e.Attributes)
+                .FirstOrDefaultAsync(e => e.Id == employeeId);    
+
+            if (employee == null)
+                return new Response<CEmployee>
+                {
+                    Data = null,
+                    StatusCode = ErrorCodes.EmployeeNotFound,
+                    Description = "No employee with this id exists."
+                };
+
+
+            if (employee.hasAttribute(attribute.Name))
+                return new Response<CEmployee>
+                {
+                    Data = null,
+                    StatusCode = ErrorCodes.EmployeeAlreadyHasThisAttribute,
+                    Description = "This employee already has this attribute."
+                };
+
+
+            employee.Attributes.Add(attribute);
+
+            if (await _dbContext.SaveChangesAsync() != 2)
+                return new Response<CEmployee>
+                {
+                    Data = null,
+                    StatusCode = ErrorCodes.InternalError,
+                    Description = "No changes saved."
+                };
+
+            return new Response<CEmployee>
+            {
+                Data = employee,
+                StatusCode = ErrorCodes.Success,
+                Description = "Attribute added successfully."
+            };
+
+        }
+
+        public async Task<Response<CEmployee>> RemoveAttribute(Guid? employeeId, Guid? attributeId)
+        {
+            var employee = await _dbContext.CEmployees
+                .Include(e => e.Attributes)
+                .FirstOrDefaultAsync(e => e.Id == employeeId);
+
+            if (employee == null)
+                return new Response<CEmployee>
+                {
+                    Data = null,
+                    StatusCode = ErrorCodes.EmployeeNotFound,
+                    Description = "No employee with this id exists."
+                };
+
+
+            if (!employee.hasAttribute(attributeId))
+                return new Response<CEmployee>
+                {
+                    Data = null,
+                    StatusCode = ErrorCodes.EmployeeNoAttributeId,
+                    Description = "This employee does not have an attribute with this id."
+                };
+
+            var attribute = await _dbContext.CAttributes.FirstOrDefaultAsync(a => a.Id == attributeId);
+
+            employee.Attributes.Remove(attribute);
+
+            if (await _dbContext.SaveChangesAsync() != 1)
+                return new Response<CEmployee>
+                {
+                    Data = null,
+                    StatusCode = ErrorCodes.InternalError,
+                    Description = "No changes saved."
+                };
+
+            return new Response<CEmployee>
+            {
+                Data = employee,
+                StatusCode = ErrorCodes.Success,
+                Description = "Attribute added successfully."
+            };
+
+        }
     }
 }

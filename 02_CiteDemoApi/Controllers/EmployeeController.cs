@@ -2,10 +2,11 @@
 using CiteDemoBL.Models;
 using CiteDemoBL.Services;
 using CiteDemoBL.Static;
-using Geocoding;
 using Geocoding.Google;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+using GoogleApi.Entities.Maps.Directions.Request;
+using GoogleApi.Entities.Maps.Directions.Response;
+using GoogleApi.Entities.Maps.Common;
 
 namespace CiteDemoApi.Controllers
 {
@@ -13,29 +14,32 @@ namespace CiteDemoApi.Controllers
     [ApiController]
     public class EmployeeController : Controller
     {
-        private IEmployeeService _employeeService;
+        private readonly IEmployeeService _employeeService;
+        private readonly IAttributeService _attributeService;
+        private readonly string APIKEY = "API_KEY_HERE";
 
-        public EmployeeController(IEmployeeService employeeService)
+        public EmployeeController(IEmployeeService employeeService, IAttributeService attributeService)
         {
             _employeeService = employeeService;
+            _attributeService = attributeService;
         }
 
         [HttpGet, Route("{id}")]
-        public ActionResult<EmployeeGetDTO> GetEmployee([FromRoute] Guid id)
+        public async Task<ActionResult<EmployeeGetDTO>> GetEmployee([FromRoute] Guid id)
         {
-            Response<CEmployee> response =  _employeeService.ReadEmployee(id);
+            Response<CEmployee> response =  await _employeeService.ReadEmployee(id);
 
-            if (response.StatusCode != ErrorCodes.Success) return NotFound("No employee found with this id");
+            if (response.StatusCode != ErrorCodes.Success) return NotFound(response.Description);
 
             return Ok(new EmployeeGetDTO(response.Data));
         }
 
         [HttpGet]
-        public ActionResult<ICollection<EmployeeGetDTO>> GetEmployee()
+        public async Task<ActionResult<ICollection<EmployeeGetDTO>>> GetEmployee()
         {
-            Response<ICollection<CEmployee>> response = _employeeService.ReadEmployee();
+            Response<ICollection<CEmployee>> response = await _employeeService.ReadEmployee();
 
-            if (response.StatusCode != ErrorCodes.Success) return NotFound("No employee found with this id");
+            if (response.StatusCode != ErrorCodes.Success) return NotFound(response.Description);
 
             var result = new List<EmployeeGetDTO>();
 
@@ -48,18 +52,11 @@ namespace CiteDemoApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult<EmployeeGetDTO> PostEmployee([FromBody] EmployeePostDTO employee)
+        public async Task<ActionResult<EmployeeGetDTO>> PostEmployee([FromBody] EmployeePostDTO employee)
         {
+            var response = await _employeeService.CreateEmployee(employee.ToCEmployee(), employee.SupervisorId);
 
-            Response<CEmployee> response;
-
-            if (employee.SupervisorId != null)
-                response = _employeeService.CreateEmployee(employee.ToCEmployee(), new Guid(employee.SupervisorId));
-            else
-                response = _employeeService.CreateEmployee(employee.ToCEmployee());
-            
-
-            if (response.StatusCode != ErrorCodes.Success) return BadRequest("Could not add employee");
+            if (response.StatusCode != ErrorCodes.Success) return BadRequest(response.Description);
 
             return Ok(new EmployeeGetDTO(response.Data));
 
@@ -69,12 +66,11 @@ namespace CiteDemoApi.Controllers
         public async Task<ActionResult<EmployeeGetDTO>> PostEmployeeGeocoding([FromBody] EmployeePostGeocodingDTO employee)
         {
             CEmployee employeeObj = employee.ToCEmployee();
-            Response<CEmployee> response;
 
             try
             {
-                GoogleGeocoder geocoder = new GoogleGeocoder() { ApiKey = "api key here " };
-                IEnumerable<Address> addresses = await geocoder.GeocodeAsync(employee.Address);
+                GoogleGeocoder geocoder = new GoogleGeocoder() { ApiKey = this.APIKEY };
+                IEnumerable<Geocoding.Address> addresses = await geocoder.GeocodeAsync(employee.Address);
 
                 employeeObj.AddressLatitude = (decimal)addresses.First().Coordinates.Latitude;
                 employeeObj.AddressLongitude = (decimal)addresses.First().Coordinates.Longitude;
@@ -84,29 +80,35 @@ namespace CiteDemoApi.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error within the google geocoding api occured");
             }
 
-            if (employee.SupervisorId != null)
-                response = _employeeService.CreateEmployee(employeeObj, new Guid(employee.SupervisorId));
-            else
-                response = _employeeService.CreateEmployee(employeeObj);
+            var response = await _employeeService.CreateEmployee(employeeObj, employee.SupervisorId);
 
-
-            if (response.StatusCode != ErrorCodes.Success) return BadRequest("Could not add employee");
+            if (response.StatusCode != ErrorCodes.Success) return BadRequest(response.Description);
 
             return Ok(new EmployeeGetDTO(response.Data));
+        }
 
+        [HttpPost, Route("Attribute")]
+        public async Task<ActionResult<EmployeeGetDTO>> PostEmployeeAddAttribute([FromBody] EmployeeAttributeDTO dto)
+        {
+
+            var attributeResponse = await _attributeService.ReadAttribute(dto.AttributeId);
+
+            if (attributeResponse.StatusCode != ErrorCodes.Success) return BadRequest(attributeResponse.Description);
+
+            var attribute = attributeResponse.Data;
+
+            var response = await _employeeService.AddAttribute(dto.EmployeeId, attribute);
+
+            if (response.StatusCode != ErrorCodes.Success) return BadRequest(response.Description);
+
+            return Ok(new EmployeeGetDTO(response.Data));
         }
 
         [HttpPut]
-        public ActionResult<EmployeeGetDTO> PutEmployee([FromBody] EmployeePutDTO employee)
+        public async Task<ActionResult<EmployeeGetDTO>> PutEmployee([FromBody] EmployeePutDTO employee)
         {
 
-            Response<CEmployee> response;
-
-            if (employee.SupervisorId != null)
-                response = _employeeService.UpdateEmployee(employee.ToCEmployee(), new Guid(employee.SupervisorId));
-            else
-                response = _employeeService.UpdateEmployee(employee.ToCEmployee());
-
+            var response = await _employeeService.UpdateEmployee(employee.ToCEmployee(), employee.SupervisorId);
 
             if (response.StatusCode != ErrorCodes.Success) return BadRequest(response.Description);
 
@@ -115,13 +117,65 @@ namespace CiteDemoApi.Controllers
         }
 
         [HttpDelete, Route("{id}")]
-        public ActionResult<bool> DeleteEmployee([FromRoute] Guid id)
+        public async Task<ActionResult<bool>> DeleteEmployee([FromRoute] Guid id)
         {
-            Response<bool> response = _employeeService.DeleteEmployee(id);
+            Response<bool> response = await _employeeService.DeleteEmployee(id);
 
-            if (response.StatusCode != ErrorCodes.Success) return NotFound("No employee found with this id");
+            if (response.StatusCode != ErrorCodes.Success) return NotFound(response.Description);
 
-            return Ok(response.Data);
+            return Ok(response.Description);
         }
+
+        [HttpDelete, Route("Attribute")]
+        public async Task<ActionResult<EmployeeGetDTO>> DeleteEmployeeRemoveAttribute([FromQuery] Guid employeeId, [FromQuery] Guid attributeId)
+        {
+
+            var response = await _employeeService.RemoveAttribute(employeeId, attributeId);
+
+            if (response.StatusCode != ErrorCodes.Success) return BadRequest(response.Description);
+
+            return Ok(new EmployeeGetDTO(response.Data));
+        }
+
+        [HttpGet, Route("Directions")]
+        public async Task<ActionResult<DirectionsResponse>> GetDirections([FromQuery] Guid employeeFromId, [FromQuery] Guid employeeToId)
+        {
+            DirectionsResponse directionsResponse;
+
+            Response<CEmployee> responseFrom = await _employeeService.ReadEmployee(employeeFromId);
+
+            if (responseFrom.StatusCode != ErrorCodes.Success) return NotFound($"No employee found with this id {employeeFromId}.");
+
+            Response<CEmployee> responseTo = await _employeeService.ReadEmployee(employeeToId);
+
+            if (responseTo.StatusCode != ErrorCodes.Success) return NotFound($"No employee found with this id {employeeToId}.");
+
+            var employeeFrom = responseFrom.Data;
+            var employeeTo = responseTo.Data;
+
+            try
+            {
+                DirectionsRequest request = new DirectionsRequest();
+
+                request.Key = this.APIKEY;
+
+                request.Origin = new LocationEx(new CoordinateEx((double)employeeFrom.AddressLatitude, (double)employeeFrom.AddressLongitude));
+                request.Destination = new LocationEx(new CoordinateEx((double)employeeTo.AddressLatitude, (double)employeeTo.AddressLongitude));
+
+                if (employeeFrom.HasCar)
+                    request.TravelMode = GoogleApi.Entities.Maps.Common.Enums.TravelMode.Driving;
+                else
+                    request.TravelMode = GoogleApi.Entities.Maps.Common.Enums.TravelMode.Walking;
+
+                directionsResponse = GoogleApi.GoogleMaps.Directions.Query(request);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error within the google directions api occured.");
+            }
+
+            return Ok(directionsResponse);
+        }
+
     }
 }

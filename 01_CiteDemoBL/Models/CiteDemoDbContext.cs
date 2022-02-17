@@ -7,17 +7,11 @@ namespace CiteDemoBL.Models
         public DbSet<CAttribute> CAttributes { get; set; }
         public DbSet<CEmployee> CEmployees { get; set; }
 
-        public CiteDemoDbContext() : base() { }
         public CiteDemoDbContext(DbContextOptions options) : base(options) { }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder builder)
-        {
-            builder.UseSqlServer("Data Source = localhost; Initial Catalog = CiteDemo; User ID = sa; Password = admin!@#123");
-        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            // Configure intermediate entity for many to many mapping
             modelBuilder.Entity<EmployeeAttribute>()
                 .HasOne(e => e.Employee)
                 .WithMany()

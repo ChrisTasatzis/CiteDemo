@@ -6,23 +6,34 @@ namespace CiteDemoBL.Services
 {
     public class AttributeService : IAttributeService
     {
-        private CiteDemoDbContext _dbContext;
+        private readonly CiteDemoDbContext _dbContext;
 
         public AttributeService(CiteDemoDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public Response<CAttribute> CreateAttribute(CAttribute attribute)
+        public async Task<Response<CAttribute>> CreateAttribute(CAttribute attribute)
         {
+            var attributeDB = await _dbContext.CAttributes
+               .FirstOrDefaultAsync(u => u.Name == attribute.Name && u.Value == attribute.Value);
+
+            if (attributeDB != null)
+                return new Response<CAttribute>
+                {
+                    Data = null,
+                    StatusCode = ErrorCodes.AttributeAlreadyExists,
+                    Description = "Attribute already exists."
+                };
+
             _dbContext.CAttributes.Add(attribute);
 
-            if (_dbContext.SaveChanges() != 1)
+            if (await _dbContext.SaveChangesAsync() != 1)
                 return new Response<CAttribute>
                 {
                     Data = null,
                     StatusCode = ErrorCodes.InternalError,
-                    Description = "Could not save changes."
+                    Description = "No changes saved."
                 };
 
             return new Response<CAttribute>
@@ -33,18 +44,18 @@ namespace CiteDemoBL.Services
             };
         }
 
-        public Response<CAttribute> ReadAttribute(Guid id)
+        public async Task<Response<CAttribute>> ReadAttribute(Guid? id)
         {
-            var attribute = _dbContext.CAttributes
+            var attribute = await _dbContext.CAttributes
                 .AsNoTracking()
-                .FirstOrDefault(u => u.Id == id);
+                .FirstOrDefaultAsync(u => u.Id == id);
 
 
             if (attribute == null)
                 return new Response<CAttribute>
                 {
                     Data = null,
-                    StatusCode = ErrorCodes.InternalError,
+                    StatusCode = ErrorCodes.AttributeNotFound,
                     Description = "No attribute with this id exists."
                 };
 
@@ -56,33 +67,41 @@ namespace CiteDemoBL.Services
             };
         }
 
-        public Response<ICollection<CAttribute>> ReadAttribute()
+        public async Task<Response<ICollection<CAttribute>>> ReadAttribute()
         {
-            var attributes = _dbContext.CAttributes
+            var attributes = await _dbContext.CAttributes
                 .AsNoTracking()
-                .ToList();
+                .ToListAsync();
 
             return new Response<ICollection<CAttribute>>
             {
                 Data = attributes,
                 StatusCode = ErrorCodes.Success,
-                Description = "CAttribute Found."
+                Description = "CAttributes Found."
             };
         }
 
-        public Response<CAttribute> UpdateAttribute(CAttribute attribute)
+        public async Task<Response<CAttribute>> UpdateAttribute(CAttribute attribute)
         {
-            var attributeDB = _dbContext.CAttributes
-                .FirstOrDefault(u => u.Id == attribute.Id);
+            var attributeDB = await _dbContext.CAttributes
+                .FirstOrDefaultAsync(u => u.Id == attribute.Id);
+
+            if(attributeDB == null)
+                return new Response<CAttribute>
+                {
+                    Data = null,
+                    StatusCode = ErrorCodes.AttributeNotFound,
+                    Description = "No attribute with this id exists."
+                };
 
             attributeDB.Copy(attribute);
 
-            if (_dbContext.SaveChanges() != 1)
+            if (await _dbContext.SaveChangesAsync() != 1)
                 return new Response<CAttribute>
                 {
                     Data = null,
                     StatusCode = ErrorCodes.InternalError,
-                    Description = "Could not save changes."
+                    Description = "No changes saved."
                 };
 
             return new Response<CAttribute>
@@ -93,19 +112,27 @@ namespace CiteDemoBL.Services
             };
         }
 
-        public Response<bool> DeleteAttribute(Guid id)
+        public async  Task<Response<bool>> DeleteAttribute(Guid? id)
         {
-            var attribute = _dbContext.CAttributes
-                .FirstOrDefault(u => u.Id == id);
+            var attribute = await _dbContext.CAttributes
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (attribute == null)
+                return new Response<bool>
+                {
+                    Data = false,
+                    StatusCode = ErrorCodes.AttributeNotFound,
+                    Description = "No attribute with this id exists."
+                };
 
             _dbContext.CAttributes.Remove(attribute);
 
-            if (_dbContext.SaveChanges() != 1)
+            if (await _dbContext.SaveChangesAsync() != 1)
                 return new Response<bool>
                 {
                     Data = false,
                     StatusCode = ErrorCodes.InternalError,
-                    Description = "Could not save changes."
+                    Description = "No changes saved."
                 };
 
             return new Response<bool>

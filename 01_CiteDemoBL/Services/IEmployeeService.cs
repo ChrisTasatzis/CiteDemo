@@ -5,19 +5,18 @@ namespace CiteDemoBL.Services
 {
     public interface IEmployeeService
     {
-        Response<CEmployee> CreateEmployee(CEmployee employee, Guid? supervisorId);
+        Task<Response<CEmployee>> CreateEmployee(CEmployee employee, Guid? supervisorId);
 
-        Response<CEmployee> CreateEmployee(CEmployee employee);
+        Task<Response<ICollection<CEmployee>>> ReadEmployee();
 
-        Response<ICollection<CEmployee>> ReadEmployee();
+        Task<Response<CEmployee>> ReadEmployee(Guid? id);
 
-        Response<CEmployee> ReadEmployee(Guid id);
+        Task<Response<CEmployee>> UpdateEmployee(CEmployee employee, Guid? supervisorId);
 
-        Response<CEmployee> UpdateEmployee(CEmployee employee);
+        Task<Response<bool>> DeleteEmployee(Guid? id);
 
-        Response<CEmployee> UpdateEmployee(CEmployee employee, Guid? supervisorId);
+        Task<Response<CEmployee>> AddAttribute(Guid? employeeId, CAttribute attribute);
 
-        Response<bool> DeleteEmployee(Guid id);
-
+        Task<Response<CEmployee>> RemoveAttribute(Guid? employeeId, Guid? attributeId);
     }
 }

@@ -28,8 +28,7 @@ namespace CiteDemoApi.DTO.CEmployeeDTOS
         [Range(-180, 180)]
         public decimal? AddressLongitude { get; set; }
 
-        [RegularExpression("^[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}$", ErrorMessage = "Not a Valid Guid")]
-        public string? SupervisorId { get; set; }
+        public Guid? SupervisorId { get; set; }
 
         public CEmployee ToCEmployee()
         {
