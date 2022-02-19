@@ -10,13 +10,13 @@ using GoogleApi.Entities.Maps.Common;
 
 namespace CiteDemoApi.Controllers
 {
-    [Route("Employee")]
+    [Route("Api/Employee")]
     [ApiController]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeService _employeeService;
         private readonly IAttributeService _attributeService;
-        private readonly string APIKEY = "API_KEY_HERE";
+        private readonly string APIKEY = "";
 
         public EmployeeController(IEmployeeService employeeService, IAttributeService attributeService)
         {

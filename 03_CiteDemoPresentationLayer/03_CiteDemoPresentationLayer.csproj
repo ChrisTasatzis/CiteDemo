@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -6,5 +6,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>_03_CiteDemoPresentationLayer</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\01_CiteDemoBL\01_CiteDemoBusinessLayer.csproj" />
+    <ProjectReference Include="..\02_CiteDemoApi\02_CiteDemoApi.csproj" />
+  </ItemGroup>
 
 </Project>

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CiteDemoApi.Controllers
 {
-    [Route("Attribute")]
+    [Route("Api/Attribute")]
     [ApiController]
     public class AttributeController : Controller
     {

@@ -1,0 +1,44 @@
+﻿@using _03_CiteDemoPresentationLayer.Models.Employee
+@{
+    ViewData["Title"] = "Employees Page";
+}
+
+@model UpdateViewModel
+
+<div class="text-center">
+    <h1 class="display-4">Insert a new Employee</h1>
+
+    <form asp-controller="Employee" asp-action="UpdatePost" method="post">
+
+        <input type="hidden" asp-for="Id" value="@(Model.Id)" />
+        <input type="hidden" asp-for="AddressLongitude" value="@(Model.AddressLongitude)" />
+        <input type="hidden" asp-for="AddressLatitude" value="@(Model.AddressLatitude)" />
+
+        <div class="form-floating mb-3 mt-3">
+            <input asp-for="Name" type="text" class="form-control" value="@(Model.Name)" name="Name" />
+            <label asp-for="Name">Name:</label>
+        </div>
+
+        <div class="form-floating mb-3 mt-3">  
+            <input asp-for="DateOfBirth" type="text" class="form-control" placeholder="Enter Date of Birth (YYYY-MM-DD)" name="DateOfBirth">
+            <label asp-for="DateOfBirth">DateOfBirth:</label>
+        </div>
+
+        <div class="form-floating mb-3 mt-3">  
+            <input asp-for="HasCar" type="text" class="form-control" placeholder="Enter has car" name="HasCar">
+            <label asp-for="HasCar">HasCar:</label>
+        </div>
+
+        <div class="form-floating mb-3 mt-3">  
+            <input asp-for="Address" type="text" class="form-control" placeholder="Enter Address" name="Address">
+            <label asp-for="Address">Address:</label>
+        </div>
+
+        <div class="mb-3 mt-3">
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+
+        <div asp-validation-summary="All" class="text-danger"></div>
+    </form>
+
+</div>

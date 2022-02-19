@@ -1,0 +1,69 @@
+﻿@using _03_CiteDemoPresentationLayer.Models.Employee
+@{
+    ViewData["Title"] = "Employees Page";
+}
+
+<script>
+
+    window.onload = () => {
+        // Replace , with . on decimal values. This most probably could be done better CultureInfo
+        $('.AddressLatitude').val($('.AddressLatitude').val().replace(/\,/g,'.'));
+        $('.AddressLongitude').val($('.AddressLongitude').val().replace(/\,/g,'.'));
+    };
+      
+</script>
+
+@model IndexViewModel
+
+<div class="text-center">
+    <h1 class="display-4">Home Page</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Date of Birth</th>
+                <th>Has Car</th>
+                <th>Address</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Employee in Model.Employees)
+            {
+                <tr>
+                    <td>@(Employee.Name)</td>
+                    <td>@(Employee.DateOfBirth)</td>
+                    <td>@(Employee.HasCar)</td>
+                    <td>@(Employee.Address)</td>                 
+                    <td>
+                        <form asp-controller="Employee" asp-action="Update" method="get">
+                            <input name="Id" type="hidden" value=@(Employee.Id) />
+                            <input class="AddressLatitude" name="AddressLatitude" type="hidden" value=@(Employee.AddressLatitude.ToString()) />
+                            <input class="AddressLongitude" name="AddressLongitude" type="hidden" value=@(Employee.AddressLongitude.ToString())  />
+                            <input name="Name" type="hidden" value=@(Employee.Name) />
+                            <input name="DateOfBirth" type="hidden" value=@(Employee.DateOfBirth) />
+                            <input name="HasCar" type="hidden" value=@(Employee.HasCar.Value.ToString()) />
+                            <input name="Address" type="hidden" value=@(Employee.Address) />
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form asp-controller="Employee" asp-action="Attributes" method="get">
+                            <input name="id" type="hidden" value=@(Employee.Id) />
+                            <button type="submit" class="btn btn-primary">Attributes</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form asp-controller="Employee" asp-action="Delete">
+                            <input name="id" type="hidden" value=@(Employee.Id) />
+                            <button type="submit" class="btn btn-primary">Delete</button>
+                        </form>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a asp-controller="Employee" asp-action="Insert" class="btn btn-primary">Insert</a>
+</div>

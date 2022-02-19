@@ -128,16 +128,21 @@ namespace CiteDemoBL.Services
 
         public async Task<Response<CEmployee>> UpdateEmployee(CEmployee employee, Guid? supervisorId)
         {
-            var supervisor = await _dbContext.CEmployees.FirstOrDefaultAsync(u => u.Id == supervisorId);
+            CEmployee? supervisor = null;
 
-            if (supervisor == null)
+            if (supervisorId != null)
             {
-                return new Response<CEmployee>
+                supervisor = await _dbContext.CEmployees.FirstOrDefaultAsync(u => u.Id == supervisorId);
+
+                if (supervisor == null)
                 {
-                    Data = null,
-                    StatusCode = ErrorCodes.SupervisorNotFound,
-                    Description = "No employee with this supervisor id exists."
-                };
+                    return new Response<CEmployee>
+                    {
+                        Data = null,
+                        StatusCode = ErrorCodes.SupervisorNotFound,
+                        Description = "No employee with this supervisor id exists."
+                    };
+                }
             }
 
             employee.Supervisor = supervisor;

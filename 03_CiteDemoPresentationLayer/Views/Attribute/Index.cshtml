@@ -1,0 +1,45 @@
+﻿@using _03_CiteDemoPresentationLayer.Models.Attribute
+@{
+    ViewData["Title"] = "Attributes Page";
+}
+
+@model IndexViewModel
+
+<div class="text-center">
+    <h1 class="display-4">Home Page</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var attribute in Model.Attributes)
+            {
+                <tr>
+                    <td>@(attribute.Name)</td>
+                    <td>@(attribute.Value)</td>
+                    <td>
+                        <form asp-controller="Attribute" asp-action="Update" method="get">
+                            <input name="Id" type="hidden" value=@(attribute.Id) />
+                            <input name="Name" type="hidden" value=@(attribute.Name) />
+                            <input name="Value" type="hidden" value=@(attribute.Value) />
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form asp-controller="Attribute" asp-action="Delete">
+                            <input name="id" type="hidden" value=@(attribute.Id) />
+                            <button type="submit" class="btn btn-primary">Delete</button>
+                        </form>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a asp-controller="Attribute" asp-action="Insert" class="btn btn-primary">Insert</a>
+</div>

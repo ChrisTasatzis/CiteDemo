@@ -1,4 +1,3 @@
-using CiteDemoApi;
 using CiteDemoBL.Models;
 using CiteDemoBL.Services;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +22,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(
         builder =>
         {
-            builder.WithOrigins("http://127.0.0.1:5500")
+            builder.WithOrigins("http://127.0.0.1:5204")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });

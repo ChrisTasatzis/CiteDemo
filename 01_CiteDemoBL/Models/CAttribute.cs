@@ -10,7 +10,7 @@ namespace CiteDemoBL.Models
     {
         [Key]
         [Column("ATTR_ID")]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         [Column("ATTR_Name")]
         public string? Name { get; set; }
         [Column("ATTR_Value")]

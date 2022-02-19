@@ -1,0 +1,30 @@
+﻿@using _03_CiteDemoPresentationLayer.Models.Attribute
+@{
+    ViewData["Title"] = "Attributes Page";
+}
+
+@model InsertViewModel
+
+<div class="text-center">
+    <h1 class="display-4">Insert a new attribute</h1>
+   
+    <form asp-controller="Attribute" asp-action="Insert">
+
+        <div class="form-floating mb-3 mt-3">  
+            <input asp-for="Name" type="text" class="form-control" placeholder="Enter Name" name="Name">
+            <label asp-for="Name"  >Name:</label>
+        </div>
+
+        <div class="form-floating mb-3 mt-3">  
+            <input asp-for="Value" type="text" class="form-control" placeholder="Enter Value" name="Value">
+            <label asp-for="Value"  >Value:</label>
+        </div>
+
+        <div class="mb-3 mt-3">
+            <button type="submit" class="btn btn-primary">Insert</button>
+        </div>
+
+         <div asp-validation-summary="All" class="text-danger"></div>
+    </form>
+            
+</div>

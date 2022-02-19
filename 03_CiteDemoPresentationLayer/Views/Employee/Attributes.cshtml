@@ -1,0 +1,58 @@
+﻿@using _03_CiteDemoPresentationLayer.Models.Employee
+@{
+    ViewData["Title"] = "Employees Page";
+}
+
+<script>
+
+    window.onload = () => {
+        // Replace , with . on decimal values. This most probably could be done better CultureInfo
+        $('.AddressLatitude').val($('.AddressLatitude').val().replace(/\,/g,'.'));
+        $('.AddressLongitude').val($('.AddressLongitude').val().replace(/\,/g,'.'));
+    };
+      
+</script>
+
+@model AttributesViewModel
+
+<div class="text-center">
+    <h1 class="display-4">Employee: @(Model.Employee.Name)</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Attribute Name</th>
+                <th>Attribute Value</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var attribute in Model.Employee.Attributes)
+            {
+                <tr>
+                    <td>@(attribute.Name)</td>
+                    <td>@(attribute.Value)</td>
+                    <td>
+                        <form asp-controller="Employee" asp-action="RemoveAttribute" method="post">
+                            <input name="EmployeeId" type="hidden" value=@(Model.Employee.Id) />
+                            <input name="AttributeId" type="hidden" value=@(attribute.Id) />
+                            <button type="submit" class="btn btn-primary">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="row">
+        <form asp-controller="Employee" asp-action="AddAttribute" method="post">
+            <input name="EmployeeId" type="hidden" value=@(Model.Employee.Id) />
+            <select class="form-select" name="AttributeId">
+                @foreach(var attribute in Model.Attributes)
+                {
+                    <option value=@(attribute.Id)>@(attribute.Name): @(attribute.Value)</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-primary">Insert</button>
+        </form>
+    </div>
+    
+</div>

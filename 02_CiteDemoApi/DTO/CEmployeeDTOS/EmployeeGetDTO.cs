@@ -24,6 +24,10 @@ namespace CiteDemoApi.DTO.CEmployeeDTOS
 
         public Guid? SupervisorId { get; set; }
 
+        [JsonConstructor]
+
+        public EmployeeGetDTO() { }
+
         public EmployeeGetDTO(CEmployee employee)
         {
             Id = employee.Id;
