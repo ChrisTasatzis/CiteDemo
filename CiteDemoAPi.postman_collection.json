@@ -1,0 +1,511 @@
+{
+	"info": {
+		"_postman_id": "2f2de4d4-997e-4645-9731-95890a30aa31",
+		"name": "CiteDemoAPi",
+		"description": "This is a Postman collection for the API developed for the interview process for Cite.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Employee",
+			"item": [
+				{
+					"name": "Get",
+					"item": [
+						{
+							"name": "Employee Get All",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:7252/Employee",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Employee"
+									]
+								},
+								"description": "Returns all employees on the database. On a real application this method should expose filters and paging."
+							},
+							"response": []
+						},
+						{
+							"name": "Employee Get 1 ",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7252/Employee/EmployeeIdHere",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Employee",
+										"EmployeeIdHere"
+									]
+								},
+								"description": "Returns the information for an employee with a specific Id."
+							},
+							"response": []
+						},
+						{
+							"name": "Employee Directions Get",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7252/Employee/Directions?employeeFromId=fromIdHere&employeeToId=toIdHere",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Employee",
+										"Directions"
+									],
+									"query": [
+										{
+											"key": "employeeFromId",
+											"value": "fromIdHere"
+										},
+										{
+											"key": "employeeToId",
+											"value": "toIdHere"
+										}
+									]
+								},
+								"description": "Returns the directions to get from an employee to another."
+							},
+							"response": []
+						}
+					],
+					"description": "Get requests for employee entity."
+				},
+				{
+					"name": "Post",
+					"item": [
+						{
+							"name": "Employee Post",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"Name\",\r\n    \"DateOfBirth\": \"2022-02-12\",\r\n    \"HasCar\": true,\r\n    \"Address\": \"Address\",\r\n    \"AddressLatitude\": 81,\r\n    \"AddressLongitude\": 150,\r\n    \"SupervisorId\": \"SupervisorId\"\r\n}\r\n        \r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7252/Employee",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Employee"
+									]
+								},
+								"description": "Inserts an employee in the database, all the fields are required except SupervisorId.\n\n*   Name: max 100 characters\n*   DateOfBirth: YYYY-MM-DD format\n*   HasCar: true or false\n*   Address: max 200 characters\n*   AddressLatitude: number between -90 and 90\n*   AddressLongitude: number between -180 and 180\n*   SupervisorId: The id for the supervisor(if exists)"
+							},
+							"response": []
+						},
+						{
+							"name": "Employee Post Geocoding",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Name\",\r\n    \"dateOfBirth\": \"2022-02-12\",\r\n    \"hasCar\": true,\r\n    \"address\": \"Athens\",\r\n    \"supervisorId\": \"SupervisorId\"\r\n}  \r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7252/Employee/Geocoding",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Employee",
+										"Geocoding"
+									]
+								},
+								"description": "Inserts an employee in the database setting the Latitude and Longitude from the values that correspond to the given address, all the fields are required except SupervisorId.\n\n*   Name: max 100 characters\n*   DateOfBirth: YYYY-MM-DD format\n*   HasCar: true or false\n*   Address: max 200 characters\n*   SupervisorId: The id for the supervisor(if exists)"
+							},
+							"response": []
+						},
+						{
+							"name": "Employee Post Add Attribute",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"employeeId\": \"EmployeeId\",\r\n  \"attributeId\": \"AttributeId\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7252/Employee/Attribute",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Employee",
+										"Attribute"
+									]
+								},
+								"description": "Adds an attribute to an employee. Ideally this could be a part of a Patch method (?)."
+							},
+							"response": []
+						}
+					],
+					"description": "Post requests for employee entity."
+				},
+				{
+					"name": "Put",
+					"item": [
+						{
+							"name": "Employee Put ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"EmployeeToUpdateId\",\r\n    \"name\": \"newName\",\r\n    \"dateOfBirth\": \"2022-02-12\",\r\n    \"hasCar\": true,\r\n    \"address\": \"address\",\r\n    \"addressLatitude\": 81,\r\n    \"addressLongitude\": 150,\r\n    \"SupervisorId\": null\r\n}     \r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7252/Employee",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Employee"
+									]
+								},
+								"description": "Updartes an employee with the given id in the database, all the fields are required except SupervisorId. If we needed to update only some of the field we would have to create a Patch method.\n\n*   Id: The id for the employee to Update\n*   Name: max 100 characters\n*   DateOfBirth: YYYY-MM-DD format\n*   HasCar: true or false\n*   Address: max 200 characters\n*   AddressLatitude: number between -90 and 90\n*   AddressLongitude: number between -180 and 180\n*   SupervisorId: The id for the supervisor(if exists)"
+							},
+							"response": []
+						}
+					],
+					"description": "Put requests for employee entity."
+				},
+				{
+					"name": "Delete",
+					"item": [
+						{
+							"name": "Employee Delete ",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:7252/Employee/EmployeeIdToDeleteHere",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Employee",
+										"EmployeeIdToDeleteHere"
+									]
+								},
+								"description": "Deletes the employee with the given id."
+							},
+							"response": []
+						},
+						{
+							"name": "Employee Delete Remove Attribute",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:7252/Employee/Attribute/8729FD3A-974A-43D5-C553-08D9EE1B3641?employeeId=EmployeeIdHere&attributeId=AttributeIdHere",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Employee",
+										"Attribute",
+										"8729FD3A-974A-43D5-C553-08D9EE1B3641"
+									],
+									"query": [
+										{
+											"key": "employeeId",
+											"value": "EmployeeIdHere"
+										},
+										{
+											"key": "attributeId",
+											"value": "AttributeIdHere"
+										}
+									]
+								},
+								"description": "Removes an attribute from an employee"
+							},
+							"response": []
+						}
+					],
+					"description": "Delete requests for employee entity."
+				}
+			],
+			"description": "A controller for interacting with the employee entity."
+		},
+		{
+			"name": "Attribute",
+			"item": [
+				{
+					"name": "Get",
+					"item": [
+						{
+							"name": "Attribute Get All",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:7252/Attribute",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Attribute"
+									]
+								},
+								"description": "Returns all attributes on the database. On a real application this method should expose filters and paging."
+							},
+							"response": []
+						},
+						{
+							"name": "Attribute Get 1",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7252/Attribute/AttributeIdHere",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Attribute",
+										"AttributeIdHere"
+									]
+								},
+								"description": "Return an attribute with the given id."
+							},
+							"response": []
+						}
+					],
+					"description": "Get requests for attribute entity."
+				},
+				{
+					"name": "Post",
+					"item": [
+						{
+							"name": "Attribute Post",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"Name\": \"AttributeName\",\r\n    \"Value\": \"AttributeValue\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7252/Attribute",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Attribute"
+									]
+								},
+								"description": "Add a new attribute to the database. The attribute must have a unique combination of Name, Value\n\n*   Name: Max length 100, Required\n*   Value: Max length 100, Required"
+							},
+							"response": []
+						}
+					],
+					"description": "Post requests for attribute entity."
+				},
+				{
+					"name": "Put",
+					"item": [
+						{
+							"name": "Attribute Put",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"AttributeToUpdateId\",\r\n    \"name\": \"newName\",\r\n    \"value\": \"newValue\"\r\n}\r\n        \r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7252/Attribute",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Attribute"
+									]
+								},
+								"description": "Updates a given attribute to the database. The attribute must have a unique combination of Name, Value\n\n*   Id: The id of the attribute to update\n*   Name: Max length 100, Required\n*   Value: Max length 100, Required"
+							},
+							"response": []
+						}
+					],
+					"description": "Put requests for attribute entity."
+				},
+				{
+					"name": "Delete",
+					"item": [
+						{
+							"name": "Attribute Delete",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:7252/Attribute/AttributeToDeleteIdHere",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7252",
+									"path": [
+										"Attribute",
+										"AttributeToDeleteIdHere"
+									]
+								},
+								"description": "Deletes a given attribute. All employees with the given attribute drop it from their attribute lists."
+							},
+							"response": []
+						}
+					],
+					"description": "Delete requests for attribute entity."
+				}
+			],
+			"description": "A controller for interacting with the attribute entity."
+		}
+	]
+}

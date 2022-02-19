@@ -72,6 +72,8 @@ namespace CiteDemoApi.Controllers
                 GoogleGeocoder geocoder = new GoogleGeocoder() { ApiKey = this.APIKEY };
                 IEnumerable<Geocoding.Address> addresses = await geocoder.GeocodeAsync(employee.Address);
 
+                if(!addresses.Any()) return BadRequest("Invalid address.");
+
                 employeeObj.AddressLatitude = (decimal)addresses.First().Coordinates.Latitude;
                 employeeObj.AddressLongitude = (decimal)addresses.First().Coordinates.Longitude;
             }
