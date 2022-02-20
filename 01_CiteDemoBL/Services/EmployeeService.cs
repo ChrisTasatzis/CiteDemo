@@ -268,5 +268,30 @@ namespace CiteDemoBL.Services
             };
 
         }
+
+        public async Task<Response<ICollection<CEmployee>>> ReadEmployeesByAttribute(Guid? attributeId)
+        {
+            var employees = await _dbContext.CEmployees
+               .Include(e => e.Supervisor)
+               .Include(e => e.Attributes)
+               .Where(e => e.Attributes.Any(a => a.Id == attributeId))
+               .AsNoTracking()
+               .ToListAsync();
+
+            if (!employees.Any())
+                return new Response<ICollection<CEmployee>>
+                {
+                    Data = null,
+                    StatusCode = ErrorCodes.EmployeeNotFound,
+                    Description = "No employees with this attribute exist."
+                };
+
+            return new Response<ICollection<CEmployee>>
+            {
+                Data = employees,
+                StatusCode = ErrorCodes.Success,
+                Description = "Employees Found."
+            };
+        }
     }
 }

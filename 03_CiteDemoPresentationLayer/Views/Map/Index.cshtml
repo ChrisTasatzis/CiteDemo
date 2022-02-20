@@ -1,0 +1,204 @@
+﻿@using _03_CiteDemoPresentationLayer.Models.Map
+@{
+    ViewData["Title"] = "Map Page";
+}
+
+<script>
+
+    let map;
+    let directionRenderers = new Array();
+    let directionsService;
+
+    function initMap() {
+
+      // Starting location
+      const location = { lat: 0, lng: 0};
+
+      // The map, centered at inital location
+      map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 2,
+        center: location
+      });
+
+      directionsService = new google.maps.DirectionsService();
+    }
+
+    function placePins(employees) {
+
+        var markers = [];
+
+        // Add pins
+        employees.forEach(employee => {
+
+            let posistion = { lat: employee.addressLatitude, lng: employee.addressLongitude };
+
+            markers.push( new google.maps.Marker({
+                position: posistion,
+                map: map,
+            }))
+        });
+
+        // Get the bounds that fit all pins
+        var bounds = new google.maps.LatLngBounds();
+
+        for(i=0;i<markers.length;i++) {
+           bounds.extend(markers[i].getPosition());
+        }
+
+        // Fit map to bounds
+        map.setCenter(bounds.getCenter());
+        map.fitBounds(bounds);
+    }
+
+    function poppulateSelectBox(employees) {
+
+        // Create a dictionary to store employeeId => employee pairs
+        var dict = new Object();
+
+        // Clear select box
+        $('#employeeSelect').find('option').not(':first').remove();
+
+         // Add options
+        employees.forEach(employee => {
+
+            // Add employee to dictionary
+            dict[employee.id] = JSON.stringify(employee)
+
+            let = optionValue = employee.id;
+            let = optionText = employee.name;
+
+            $('#employeeSelect').append($('<option>').val(optionValue).text(optionText));
+        });
+
+        // Save dictionary serialized 
+        $('#employeeDictionary').val(JSON.stringify(dict));
+    }
+
+    function placeDirection(fromEmpId, toEmpId) {
+
+        // Retrive serialized dictionary
+        var dictionary = JSON.parse($('#employeeDictionary').val());
+
+        // Get employees from their keys
+        var fromEmp = JSON.parse(dictionary[fromEmpId]);
+        var toEmp = JSON.parse(dictionary[toEmpId]);
+
+        // Create locations
+        var from = new google.maps.LatLng(fromEmp.addressLatitude, fromEmp.addressLongitude);
+        var to = new google.maps.LatLng(toEmp.addressLatitude, toEmp.addressLongitude);
+
+        // Set travel mode according to employee car status
+        let travelModel;
+
+        if(fromEmp.hasCar) 
+            travelModel = 'DRIVING';
+        else 
+            travelModel = 'WALKING';
+  
+        // Call google API to get directions
+        directionsService
+        .route({
+            origin: from,
+            destination: to,
+            travelMode: travelModel,
+        })
+        .then((response) => {
+            let directionsRenderer = new google.maps.DirectionsRenderer({map:map});
+            directionRenderers.push(directionsRenderer)
+            directionsRenderer.setDirections(response);
+        })
+        .catch(() => window.alert("Directions request failed"));
+    }
+
+    function removeDirections() {
+
+        directionRenderers.forEach( (renderer) => renderer.setMap(null) );
+
+        directionRenderers = new Array()
+    }
+
+    window.onload = () => {
+
+        // Place the empty map
+        initMap();
+
+        // Find button listener
+        $('#findButton').off('click').on('click', () => {
+
+            // Clear past directions
+            removeDirections() 
+
+            // Attribute selected from the select box
+            let attributeId = $('#attributeSelect option:selected').val();
+
+            // Get all employees with the given attribute (if none we display the initial map)
+            $.ajax({
+                type: 'Get',
+                url: 'https://localhost:7252/Api/Employee/Attribute/'+attributeId,
+            }).done(function (data) {
+                poppulateSelectBox(data);
+                placePins(data);
+                $('#directions').show();
+            }).fail(function () {
+                initMap();
+                $('#directions').hide();
+            })
+        });
+
+        // Get Directions Button listener
+        $('#directionsButton').off('click').on('click', () => {
+
+            // Clear past directions
+            removeDirections() 
+
+            // Attribute selected from the select box
+            let selectedEmployeeId = $('#employeeSelect option:selected').val();
+
+            // Selection with id 0 is the "None selection"
+            if(selectedEmployeeId == 0) return;
+
+            $("#employeeSelect option").each(function() {
+            
+                let currentEmployeeId = $(this).val();
+
+                // Value = 0 means its the "None selection"
+                if(currentEmployeeId == 0 || currentEmployeeId == selectedEmployeeId)
+                    return;
+
+                placeDirection(selectedEmployeeId, currentEmployeeId);
+
+            });
+        });
+
+    };
+</script>
+
+
+@model IndexViewModel
+
+<div class="text-center">
+    <h1 class="display-4">Map Page</h1>
+    <select id="attributeSelect" class="form-select mb-3" name="AttributeId">
+        @foreach (var attribute in Model.Attributes)
+        {
+            <option value=@(attribute.Id)>@(attribute.Name): @(attribute.Value)</option>
+        }
+    </select>
+
+    <button id="findButton" class="btn btn-primary mb-3">Find</button>
+
+    <div id="directions" style="display:none">
+        <select id="employeeSelect" class="form-select mb-3" name="AttributeId">
+            <option value=0>None</option>
+        </select>
+        <button id="directionsButton" class="btn btn-primary mb-3">Get Directions</button>
+    </div>
+
+    <div id="map"></div>
+
+    <input type="hidden" id="employeeDictionary"/>
+</div>
+
+<!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCJMIK3u5bWRKjT7qelwoApjuG6POuq_ng&callback=initMap&libraries=&v=weekly"
+        async defer></script>

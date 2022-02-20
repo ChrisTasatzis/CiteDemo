@@ -9,6 +9,8 @@ namespace CiteDemoBL.Services
 
         Task<Response<ICollection<CEmployee>>> ReadEmployee();
 
+        Task<Response<ICollection<CEmployee>>> ReadEmployeesByAttribute(Guid? attributeId);
+
         Task<Response<CEmployee>> ReadEmployee(Guid? id);
 
         Task<Response<CEmployee>> UpdateEmployee(CEmployee employee, Guid? supervisorId);

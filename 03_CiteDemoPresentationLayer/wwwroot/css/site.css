@@ -16,3 +16,11 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Set the size of the div element that contains the map */
+#map {
+    height: 30vw;
+    /* The height is 400 pixels */
+    width: 100%;
+    /* The width is the width of the web page */
+}
