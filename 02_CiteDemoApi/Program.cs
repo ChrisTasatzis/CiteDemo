@@ -16,7 +16,7 @@ builder.Services.AddDbContext<CiteDemoDbContext>(options =>
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IAttributeService, AttributeService>();
 
-// This is needed in order to run accept API calls from the front end
+// This is needed in order to accept API calls from the front end
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(

@@ -16,7 +16,7 @@ namespace CiteDemoApi.Controllers
     {
         private readonly IEmployeeService _employeeService;
         private readonly IAttributeService _attributeService;
-        private readonly string APIKEY = "AIzaSyCE58O2OriZu7IzWG_J5e5Uc5_hXAzTL2k";
+        private readonly string APIKEY = "API_KEY_HERE";
 
         public EmployeeController(IEmployeeService employeeService, IAttributeService attributeService)
         {
